@@ -23,7 +23,7 @@ function App() {
     formData.append("image", selectedImage);
 
     try {
-      const response = await fetch('http://localhost:4200/upload', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/upload`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
