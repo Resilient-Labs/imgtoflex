@@ -23,12 +23,17 @@ function App() {
     formData.append("image", selectedImage);
 
     try {
-      const response = await fetch("/upload", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/upload`, {
         method: "POST",
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: selectedImage.name}),
       });
 
       if (response.ok) {
+        const responseData = await response.json();
+        console.log("Response from server: ", responseData)
         alert("Image uploaded successfully!");
       } else {
         alert("Image upload failed.");

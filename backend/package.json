@@ -4,14 +4,17 @@
   "description": "Backend for ImgToFlex Ascend",
   "main": "app.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "dev": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
-  "type":"module",
+  "type": "module",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "mongoose": "^8.6.1",
     "nodemon": "^3.1.4"
   }
 }
