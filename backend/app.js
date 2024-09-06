@@ -11,6 +11,11 @@ app.use(bodyParser.json());
 
 mongoose.connect(MONGO_URI).then(() => console.log("Connected to DB")).catch(error => console.log(error));
 
+app.post('/upload', async (req,res) => {
+    const newImage = req.body;
+    console.log("here is our image: ", newImage);
+})
+
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
 })

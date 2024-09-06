@@ -22,12 +22,18 @@ function App() {
     const formData = new FormData();
     formData.append("image", selectedImage);
 
+    console.log(formData)
+    console.log(selectedImage)
+
+    //selectedImage.name
+
     try {
-      const response = await fetch("/upload", {
+      const response = await fetch("http://localhost:5173/upload", {
         method: "POST",
-        body: formData,
+        body: selectedImage.name,
       });
 
+      console.log(response.body)
       if (response.ok) {
         alert("Image uploaded successfully!");
       } else {
