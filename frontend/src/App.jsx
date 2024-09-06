@@ -22,19 +22,18 @@ function App() {
     const formData = new FormData();
     formData.append("image", selectedImage);
 
-    console.log(formData)
-    console.log(selectedImage)
-
-    //selectedImage.name
-
     try {
-      const response = await fetch("http://localhost:5173/upload", {
+      const response = await fetch('http://localhost:4200/upload', {
         method: "POST",
-        body: selectedImage.name,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: selectedImage.name}),
       });
 
-      console.log(response.body)
       if (response.ok) {
+        const responseData = await response.json();
+        console.log("Response from server: ", responseData)
         alert("Image uploaded successfully!");
       } else {
         alert("Image upload failed.");
