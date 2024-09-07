@@ -15,12 +15,16 @@ const useImageUploader = () => {
         setIsImageUploading(true);
 
         try {
+            const imageData = new FormData();
+   
+            imageData.append('file', selectedImage)
+            imageData.append('imageName', selectedImage.name)
+            imageData.append('imageType', selectedImage.type)
+            imageData.append('imageSize', selectedImage.size)
+
             const response = await fetch(`${backendURL}/upload`, {
                 method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name: selectedImage.name }),
+                body: imageData,
             });
 
             if (response.ok) {
