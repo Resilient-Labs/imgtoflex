@@ -27,14 +27,11 @@ const s3 = new AWS.S3();
 // Configure multer to use memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-console.log("upload  :", upload)
 mongoose.connect(MONGO_URI).then(() => console.log("Connected to DB")).catch(error => console.log(error));
 
 app.post('/upload', upload.single('file'), async (req, res) => {
     const { file } = req; // Image file for S3 integration
-    console.log("file    :", file)
     const { imageName, imageType, imageSize } = req.body; // Other data
-    console.log("______________________")
    
     // Upload the file to S3
     const params = {
@@ -43,13 +40,9 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         Body: file.buffer,
         ContentType: file.mimetype,
     };
-    console.log("______________________")
-    console.log("params    :", params)
 
     try {
         const s3Response = await s3.upload(params).promise();
-        console.log('S3 Response:', s3Response);
-
         const prompt = new Prompt({ imgName: imageName });
         await prompt.save();
 
