@@ -21,6 +21,7 @@ function App() {
 
   const onFormSubmit = async (event) => {
     event.preventDefault();
+    console.log("Form submitted with image:", selectedImage); // Log before submitting
     handleSubmit(selectedImage);
 
     if (!selectedImage) {
@@ -28,24 +29,15 @@ function App() {
       return;
     }
 
-    // FormData to handle file upload
+    // Create FormData object and append the image file
     const formData = new FormData();
-    formData.append("image", selectedImage);
+    formData.append("file", selectedImage);  // Field name must match what the backend expects
 
     try {
-      // TODO: Add image validation for file type
-      // anthropic only accepts 4 image file types
-      setImageFormat(await imageService.validateImage(selectedImage));
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/upload`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name: selectedImage.name }),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/upload`, {
+        method: "POST",
+        body: formData,  // Send FormData without manually setting headers
+      });
 
       if (response.ok) {
         const responseData = await response.json();
