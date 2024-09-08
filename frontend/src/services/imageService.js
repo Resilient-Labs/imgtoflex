@@ -1,4 +1,5 @@
 const allowedImageTypeByExtension = {
+  ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".png": "image/png",
   ".gif": "image/gif",
@@ -21,11 +22,12 @@ class ImageService {
       return allowedImageTypeByExtension[imageFileExtension[0]];
     } else {
       throw new Error(
-        "Image not allowed. Image must be .jpg, .png, .gif, .webp"
+        "Image not allowed. Image must be .jpg, .jpeg, .png, .gif, .webp"
       );
     }
   }
 
+  // Alternate method to find the extension
   // async #validateImageTypeByLast10(image) {
   //   let imageType;
   //   const last10OfFileName = image.name.slice(-10);
