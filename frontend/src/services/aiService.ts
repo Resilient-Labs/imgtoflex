@@ -1,8 +1,8 @@
 import Anthropic, { fileFromPath } from "@anthropic-ai/sdk";
 
-const VITE_ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY; // const DEFAULT_ANTHROPIC_KEY = process.env["ANTHROPIC_API_KEY"];
+const VITE_ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
-const defaultPrompt = "Provide the CSS code for the image";
+const defaultPrompt = "Provide the CSS code for the image"; // Need a more robustly engineer prompt
 type allowedImageTypes = // Image type validation needed on front end - soft blocker
   "image/jpeg" | "image/png" | "image/gif" | "image/webp";
 
@@ -49,7 +49,8 @@ class AIService {
         ],
       });
     } catch (error) {
-      console.log("error caught");
+      console.log("error caught", error.message);
+      throw new Error("Error in request to Claude API" + error.message);
     }
     if (message) {
       console.log("message", message.content);
