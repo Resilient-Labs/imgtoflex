@@ -4,6 +4,9 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import multer from 'multer';
 import Prompt from './models/promptSchema.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,8 +14,17 @@ const MONGO_URI = process.env.MONGO_URI;
 app.use(cors());
 app.use(express.json());
 
+// Calculate __dirname from import.meta.url
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const upload = multer({ dest: 'imageUploads/' });
 mongoose.connect(MONGO_URI).then(() => console.log("Connected to DB")).catch(error => console.log(error));
+
+app.use(express.static(path.join(__dirname, 'dist')));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 app.post('/upload',upload.single('file') ,async (req,res) => {
     const { file } = req; //Image file for S3 integration
