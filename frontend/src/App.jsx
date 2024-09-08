@@ -2,11 +2,6 @@ import { useState } from "react";
 import ImageForm from "./components/ImageForm";
 import useImageUploader from "./hooks/useImageUploader";
 import "./App.css";
-import { useEffect, useState } from "react";
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
 import { AIService } from "./services/aiService";
 import { ImageService } from "./services/imageService";
 
@@ -27,46 +22,44 @@ function App() {
   const onFormSubmit = async (event) => {
     event.preventDefault();
     handleSubmit(selectedImage);
+
+    if (!selectedImage) {
+      alert("Please select an image first.");
+      return;
+    }
+
+    // FormData to handle file upload
+    const formData = new FormData();
+    formData.append("image", selectedImage);
+
+    try {
+      // TODO: Add image validation for file type
+      // anthropic only accepts 4 image file types
+      setImageFormat(await imageService.validateImage(selectedImage));
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/upload`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: selectedImage.name }),
+        }
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Response from server: ", responseData);
+        setGetCodeIsVisible(true);
+        alert("Image uploaded successfully!");
+      } else {
+        alert("Image upload failed.");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Error uploading image.");
+    }
   };
-
-  if (!selectedImage) {
-    alert("Please select an image first.");
-    return;
-  }
-
-  // FormData to handle file upload
-  const formData = new FormData();
-  formData.append("image", selectedImage);
-
-  try {
-    // TODO: Add image validation for file type
-    // anthropic only accepts 4 image file types
-    setImageFormat(await imageService.validateImage(selectedImage));
-    // const response = await fetch(
-    //   `${import.meta.env.VITE_BACKEND_URL}/upload`,
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ name: selectedImage.name }),
-    //   }
-    // );
-
-    // if (response.ok) {
-    //   const responseData = await response.json();
-    //   console.log("Response from server: ", responseData);
-    setGetCodeIsVisible(true);
-    //     alert("Image uploaded successfully!");
-    //   } else {
-    //     alert("Image upload failed.");
-    //   }
-  } catch (error) {
-    console.error("Error uploading image:", error);
-    alert("Error uploading image.");
-  }
-};
-
 
   const handleGetCode = async () => {
     const processedImage = await imageService.preProcessImage(selectedImage);
