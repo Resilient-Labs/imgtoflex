@@ -21,7 +21,6 @@ function App() {
 
   const onFormSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form submitted with image:", selectedImage); // Log before submitting
     handleSubmit(selectedImage);
 
     if (!selectedImage) {
@@ -29,14 +28,13 @@ function App() {
       return;
     }
 
-    // Create FormData object and append the image file
     const formData = new FormData();
-    formData.append("file", selectedImage);  // Field name must match what the backend expects
+    formData.append("file", selectedImage);  
 
     try {
       const response = await fetch(`http://localhost:3000/upload`, {
         method: "POST",
-        body: formData,  // Send FormData without manually setting headers
+        body: formData,  
       });
 
       if (response.ok) {
