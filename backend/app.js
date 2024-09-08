@@ -42,7 +42,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         Key: `${Date.now()}_${file.originalname}`, // Unique filename for each upload
         Body: file.buffer,
         ContentType: file.mimetype,
-        ACL: 'public-read' // Set appropriate ACL
     };
     console.log("______________________")
     console.log("params    :", params)
