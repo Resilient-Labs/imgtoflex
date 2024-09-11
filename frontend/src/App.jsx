@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ImageForm from "./components/ImageForm";
+import CodeSandbox from "./components/CodeSandbox";
 import useImageUploader from "./hooks/useImageUploader";
 import "./App.css";
 import { AIService } from "./services/aiService";
@@ -83,6 +84,7 @@ function App() {
         Get Code
       </button>
       <div>{layoutResponse}</div>
+      <CodeSandbox/>
     </>
   );
 }
