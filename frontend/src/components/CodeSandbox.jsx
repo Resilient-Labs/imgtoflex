@@ -1,51 +1,50 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+import { Controlled as CodeMirror } from 'react-codemirror2';
+import 'codemirror/lib/codemirror.css'; // CodeMirror CSS
+import 'codemirror/mode/htmlmixed/htmlmixed'; // HTML mode
+import 'codemirror/mode/css/css'; // CSS mode
+import 'codemirror/theme/material.css'; // Optional: a CodeMirror theme
+import '../CodeSandBox.css'; // Import component-specific styles
+import Results from './Results'; // Import the new Results component
 
 const CodeSandbox = () => {
-  const [htmlCode, setHtmlCode] = useState(`
-    <style>
-      p {
-        color: blue;
-      }
-    </style>
-    <p>Hello World</p>
-    <script>
-      const p = document.querySelector('p');
-      setInterval(() => {
-        p.innerHTML += '! ';
-      }, 1000)
-    </script>
-  `);
-  const iframeRef = useRef(null);
-
-  const handleCodeChange = (e) => {
-    setHtmlCode(e.target.value);
-  };
-
-
-  // Update the iframe content whenever htmlCode changes
-  useEffect(() => {
-    const iframe = iframeRef.current;
-    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-
-    // Write the user-provided HTML/JS/CSS into the iframe
-    iframeDocument.open();
-    iframeDocument.write(htmlCode);
-    iframeDocument.close();
-  }, [htmlCode]);
+  const [html, setHtml] = useState('');
+  const [css, setCss] = useState('');
 
   return (
-    <div>
-      <textarea
-        rows="10"
-        cols="50"
-        value={htmlCode}
-        onChange={handleCodeChange}
-        placeholder="Write HTML code here..."
-      />
-      <div>
-        <h3>Output:</h3>
-        <iframe title="Code Output" ref={iframeRef} style={{ width: '100%', height: '300px', border: '1px dotted gray' }} />
+     <div className="editor-container">
+      <div className="editor-wrapper">
+        <h2 className='folder'>HTML Editor</h2>
+        <CodeMirror
+          value={html}
+          options={{
+            mode: 'htmlmixed',
+            theme: 'material',
+            lineNumbers: true
+          }}
+          onBeforeChange={(editor, data, value) => {
+            setHtml(value);
+          }}
+        />
       </div>
+
+      <div className="editor-wrapper">
+        <h2 className='folder'>CSS Editor</h2>
+        <CodeMirror
+          value={css}
+          options={{
+            mode: 'css',
+            theme: 'material',
+            lineNumbers: true
+          }}
+          onBeforeChange={(editor, data, value) => {
+            setCss(value);
+          }}
+        />
+      </div>
+
+  
+      <Results html={html} css={css} />
     </div>
   );
 };
