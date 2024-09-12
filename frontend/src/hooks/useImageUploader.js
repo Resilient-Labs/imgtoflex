@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const backendURL = "http://localhost:3000" //import.meta.env.VITE_BACKEND_URL
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 
 const useImageUploader = () => {
