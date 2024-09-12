@@ -3,11 +3,9 @@ import ImageForm from "./components/ImageForm";
 import CodeSandbox from "./components/CodeSandbox";
 import useImageUploader from "./hooks/useImageUploader";
 import "./App.css";
-import { AIService } from "./services/aiService";
 import { ImageService } from "./services/imageService";
 
 const imageService = new ImageService();
-const aiService = new AIService();
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -22,20 +20,29 @@ function App() {
 
   const onFormSubmit = async (event) => {
     event.preventDefault();
-    handleSubmit(selectedImage);
 
     if (!selectedImage) {
       alert("Please select an image first.");
       return;
     }
 
+    try {
+      setImageFormat(imageService.validateImage(selectedImage));
+    } catch (error) {
+      console.log("Image validation error:", error.message);
+      alert(error.message);
+      return;
+    }
+
+    handleSubmit(selectedImage);
+
     const formData = new FormData();
-    formData.append("file", selectedImage);  
+    formData.append("file", selectedImage);
 
     try {
       const response = await fetch(`http://localhost:3000/upload`, {
         method: "POST",
-        body: formData,  
+        body: formData,
       });
 
       if (response.ok) {
@@ -54,9 +61,30 @@ function App() {
 
   const handleGetCode = async () => {
     const processedImage = await imageService.preProcessImage(selectedImage);
-    const code = await aiService.getCode(imageFormat, processedImage);
-    console.log("layout code", code);
-    setLayoutResponse(code);
+    // Call the backend route to get code.
+    try {
+      const response = await fetch(`http://localhost:3000/generateLayoutCode`, {
+        method: "POST",
+        body: {
+          format: imageFormat,
+          image: processedImage,
+        },
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Response from server: ", responseData);
+        const code = responseData["layoutCode"];
+        console.log("layout code", code);
+        setLayoutResponse(code);
+        alert("Layout code successfully generated");
+      } else {
+        alert("Layout code failed to be generated.");
+      }
+    } catch (error) {
+      console.error("Error generating layout code:", error);
+      alert("Error generating layout code.");
+    }
   };
 
   return (
@@ -84,7 +112,7 @@ function App() {
         Get Code
       </button>
       <div>{layoutResponse}</div>
-      <CodeSandbox/>
+      <CodeSandbox />
     </>
   );
 }
