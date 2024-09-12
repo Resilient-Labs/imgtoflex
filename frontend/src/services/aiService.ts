@@ -2,7 +2,7 @@ import Anthropic, { fileFromPath } from "@anthropic-ai/sdk";
 
 const VITE_ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
-const defaultPrompt = "Provide the CSS code for the image"; // Need a more robustly engineer prompt
+const defaultPrompt = "Given this screenshot image of a webpage, provide me with both the CSS code for the overall layout and the accompanying HTML structure. For the CSS, I want the flexbox code for the overall layout. For the HTML, create a structure that corresponds to the layout shown in the image. Give me the code I want not as artifacts but as simple text in your response.";
 type allowedImageTypes = // Image type validation needed on front end - soft blocker
   "image/jpeg" | "image/png" | "image/gif" | "image/webp";
 

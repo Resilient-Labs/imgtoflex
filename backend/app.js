@@ -40,6 +40,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 mongoose.connect(MONGO_URI).then(() => console.log("Connected to DB")).catch(error => console.log(error));
 
+/*
 app.post('/upload', upload.single('file'), async (req, res) => {
     const { file } = req; // Image file for S3 integration
     const { imageName, imageType, imageSize } = req.body; // Other data
@@ -63,6 +64,21 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         res.status(500).json({ message: "Failed to upload image" });
     }
 });
+*/
+
+app.post('/upload',upload.single('file') ,async (req,res) => {
+  const { file } = req; //Image file for S3 integration
+  const { imageName, imageType, imageSize } = req.body; //other data
+  
+  console.log('File:', file);
+  console.log('Image Name:', imageName);
+  console.log('Image Type:', imageType);
+  console.log('Image Size:', imageSize);
+
+  const prompt = new Prompt({imgName: imageName});
+  await prompt.save();
+  res.status(200).json({message: "Image received", name: imageName})
+})
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
