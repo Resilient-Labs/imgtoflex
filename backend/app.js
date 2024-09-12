@@ -7,8 +7,6 @@ import AWS from "aws-sdk";
 import Prompt from "./models/promptSchema.js";
 import path from "path";
 import { fileURLToPath } from "url";
-
-import "./App.css";
 import { AIService } from "./services/aiService";
 
 // Calculate __dirname from import.meta.url
