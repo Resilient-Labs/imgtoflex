@@ -41,15 +41,15 @@ app.get("/", (req, res) => {
 // const s3 = new AWS.S3();
 
 // Configure multer to use memory storage
-// const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
 });
 
+// Set backend state variables to null
 let fileBufferState = null; // Stores file buffer to memory for use by other routes
-let fileMimeTypeState = null;
+let fileMimeTypeState = null; // Stores file type to memory for use by other routes
 
 // mongoose
 //   .connect(MONGO_URI)
@@ -90,54 +90,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   //   }
 });
 
-//
-
-// app.post(
-//   "/generateLayoutCode",
-//   urlencodedMiddleware,
-//   upload.single("file"),
-//   async (req, res) => {
-//     const { file } = req; // Image file
-//     const { imageFormat } = req.body; // Other data
-//     // const imageData = await imageService.preProcessImage(imageFile);
-
-//     if (!file) {
-//       console.log("No file uploaded");
-//       return res.status(400).json({ message: "No file uploaded." });
-//     }
-
-//     // Convert image file to base64string
-//     const fileBuffer = file.buffer;
-//     const imageData = fileBuffer.toString("base64");
-//     console.log("imageFormat:", imageFormat, " , ", "imageData", base64String);
-
-//     // Validate request data
-//     if (!imageFormat || typeof imageFormat != "string") {
-//       return res
-//         .status(400)
-//         .json({ message: "Invalid or missing 'imageFormat'" });
-//     }
-
-//     if (!imageData || typeof imageData !== "string") {
-//       return res
-//         .status(400)
-//         .json({ message: "Invalid or missing 'imageData'" });
-//     }
-
-//     try {
-//       // Call AIService
-//       const code = await aiService.getCode(imageFormat, imageData);
-
-//       // Send response with generated code
-//       res.status(200).json({ layoutCode: code });
-//     } catch (error) {
-//       console.error("Error processing request:", error);
-//       res.status(500).json({ message: "Failed to generate layout code" });
-//     }
-//   }
-// );
-
-// Version II: Using file state in memory
+// Call API with file state in memory
 app.post("/generateLayoutCode", async (req, res) => {
   if (!fileBufferState) {
     console.log("No image file found in memory");

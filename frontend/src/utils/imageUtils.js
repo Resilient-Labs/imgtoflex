@@ -26,21 +26,6 @@ class ImageUtils {
       );
     }
   }
-
-  // Alternate method to find the extension
-  // async #validateImageTypeByLast10(image) {
-  //   let imageType;
-  //   const last10OfFileName = image.name.slice(-10);
-  //   for (const key of allowedImageTypeByExtension) {
-  //     if (last10OfFileName.includes(key))
-  //       return allowedImageTypeByExtension[key];
-  //     if (!imageType) {
-  //       throw new Error(
-  //         "Image not allowed. Image type must be .jpg, .png, .gif, .webp"
-  //       );
-  //     }
-  //   }
-  // }
 }
 
 export { ImageUtils };

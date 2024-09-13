@@ -7,17 +7,15 @@ import "./App.css";
 import { ImageUtils } from "./utils/imageUtils";
 
 const imageUtils = new ImageUtils();
-// const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const { handleSubmit, isImageUploading } = useImageUploader();
-  const { handleGetCode, isLayoutCodeGenerating, layoutCode } =
-    useLayoutCodeGenerator();
+  const { handleGetCode, layoutCode } = useLayoutCodeGenerator();
   const [getCodeIsVisibile, setGetCodeIsVisible] = useState(false);
   const [layoutResponse, setLayoutResponse] = useState("");
 
-  // Effect to update response when code changes
+  // Effect to update response once layoutCode is updated
   useEffect(() => {
     if (layoutCode) {
       setLayoutResponse(layoutCode);
@@ -50,73 +48,12 @@ function App() {
     formData.append("file", selectedImage);
 
     setGetCodeIsVisible(true);
-
-    //   try {
-    //     const response = await fetch(`http://localhost:3000/upload`, {
-    //       method: "POST",
-    //       body: formData,
-    //     });
-
-    //     if (response.ok) {
-    //       const responseData = await response.json();
-    //       console.log("Response from server: ", responseData);
-    //       setGetCodeIsVisible(true);
-    //       alert("Image uploaded successfully!");
-    //     } else {
-    //       alert("Image upload failed.");
-    //     }
-    //   } catch (error) {
-    //     console.error("Error uploading image:", error);
-    //     alert("Error uploading image.");
-    //   }
   };
 
   // Get Code using LayoutCodeGenerate
   const onGetCodeClick = async () => {
     await handleGetCode();
-    // console.log("layoutcode on frontend", layoutCode);
-    // await setLayoutResponse(layoutCode);
   };
-
-  // const handleGetCode = async () => {
-  //   // const processedImage = await imageService.preProcessImage(selectedImage);
-
-  //   // Call the backend route to get code.
-  //   console.log("imageFormat:", imageFormat);
-  //   // var body = JSON.stringify({ imageFormat: imageFormat });
-  //   // console.log("jsonbody", body);
-  //   const imageFormData = new FormData();
-  //   // imageFormData.append("name", "imageFile");
-  //   imageFormData.append("file", selectedImage);
-  //   imageFormData.append("imageFormat", imageFormat);
-
-  //   // imageFormData.append("imageData", processedImage);
-  //   try {
-  //     const response = await fetch(`http://localhost:3000/generateLayoutCode`, {
-  //       method: "POST",
-  //       // headers: {
-  //       //   "content-type": "application/x-www-form-urlencoded",
-  //       // },
-  //       // body: imageFormData,
-  //     });
-
-  //     if (response.ok) {
-  //       const responseData = await response.json();
-  //       console.log("Response from server: ", responseData);
-  //       const code = responseData["layoutCode"];
-  //       console.log("layout code", code);
-  //       setLayoutResponse(code);
-  //       alert("Layout code successfully generated");
-  //     } else {
-  //       const responseData = await response.json();
-  //       console.log("error response data", responseData);
-  //       alert("Layout code failed to be generated.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error generating layout code:", error.message);
-  //     alert("Error generating layout code.");
-  //   }
-  // };
 
   return (
     <>
@@ -142,16 +79,7 @@ function App() {
       >
         Get Code
       </button>
-      <div
-      // style={{
-      //   display: getCodeIsVisibile ? "inline" : "none",
-      // }}
-      >
-        {isLayoutCodeGenerating
-          ? "layout code is generating"
-          : "layout is not generating right now"}
-        {layoutResponse}
-      </div>
+      <div>{layoutResponse}</div>
       <CodeSandbox />
     </>
   );
