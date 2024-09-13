@@ -1,20 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ImageForm from "./components/ImageForm";
 import CodeSandbox from "./components/CodeSandbox";
 import useImageUploader from "./hooks/useImageUploader";
+import useLayoutCodeGenerator from "./hooks/useLayoutCodeGenerator";
 import "./App.css";
-import { AIService } from "./services/aiService";
-import { ImageService } from "./services/imageService";
+import { ImageUtils } from "./utils/imageUtils";
 
-const imageService = new ImageService();
-const aiService = new AIService();
+const imageUtils = new ImageUtils();
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const { handleSubmit, isImageUploading } = useImageUploader();
+  const { handleGetCode, layoutCode } = useLayoutCodeGenerator();
   const [getCodeIsVisibile, setGetCodeIsVisible] = useState(false);
-  const [imageFormat, setImageFormat] = useState("");
   const [layoutResponse, setLayoutResponse] = useState("");
+
+  // Effect to update response once layoutCode is updated
+  useEffect(() => {
+    if (layoutCode) {
+      setLayoutResponse(layoutCode);
+    }
+  }, [layoutCode]); // Dependency on code
 
   const handleImageChange = (event) => {
     setSelectedImage(event.target.files[0]);
@@ -22,41 +28,31 @@ function App() {
 
   const onFormSubmit = async (event) => {
     event.preventDefault();
-    handleSubmit(selectedImage);
 
     if (!selectedImage) {
       alert("Please select an image first.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", selectedImage);  
-
     try {
-      const response = await fetch(`http://localhost:3000/upload`, {
-        method: "POST",
-        body: formData,  
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Response from server: ", responseData);
-        setGetCodeIsVisible(true);
-        alert("Image uploaded successfully!");
-      } else {
-        alert("Image upload failed.");
-      }
+      await imageUtils.validateImage(selectedImage);
     } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Error uploading image.");
+      console.log("Image validation error:", error.message);
+      alert(error.message);
+      return;
     }
+
+    handleSubmit(selectedImage);
+
+    const formData = new FormData();
+    formData.append("file", selectedImage);
+
+    setGetCodeIsVisible(true);
   };
 
-  const handleGetCode = async () => {
-    const processedImage = await imageService.preProcessImage(selectedImage);
-    const code = await aiService.getCode(imageFormat, processedImage);
-    console.log("layout code", code);
-    setLayoutResponse(code);
+  // Get Code using LayoutCodeGenerate
+  const onGetCodeClick = async () => {
+    await handleGetCode();
   };
 
   return (
@@ -79,12 +75,12 @@ function App() {
         style={{
           display: getCodeIsVisibile ? "inline" : "none",
         }}
-        onClick={handleGetCode}
+        onClick={onGetCodeClick}
       >
         Get Code
       </button>
       <div>{layoutResponse}</div>
-      <CodeSandbox/>
+      <CodeSandbox />
     </>
   );
 }

@@ -1,15 +1,17 @@
 import Anthropic, { fileFromPath } from "@anthropic-ai/sdk";
 
-const VITE_ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
+console.log("anthropic key", ANTHROPIC_KEY);
 
 const defaultPrompt = "Provide the CSS code for the image"; // Need a more robustly engineer prompt
-type allowedImageTypes = // Image type validation needed on front end - soft blocker
-  "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+const allowedImageTypes =
+  // Image type validation needed on front end - soft blocker
+  ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 class AIService {
   client = new Anthropic({
-    apiKey: VITE_ANTHROPIC_KEY,
-    dangerouslyAllowBrowser: true, // move this to backend
+    apiKey: ANTHROPIC_KEY,
+    // dangerouslyAllowBrowser: true, // move this to backend
   });
 
   async getCode(imageType, imageData) {
@@ -17,12 +19,22 @@ class AIService {
     return layoutCode;
   }
 
-  async #getLayout(
-    imageType: allowedImageTypes,
-    imageData: string, // there are some constraints here
-    prompt: string = defaultPrompt
-  ) {
-    console.log("imageType:", imageType);
+  async #getLayout(imageType, imageData, prompt = defaultPrompt) {
+    // Parameter validation
+    if (
+      typeof imageType != "string" ||
+      !allowedImageTypes.includes(imageType)
+    ) {
+      console.log("Invalid image type");
+      throw new Error("Invalid image type.");
+    }
+
+    const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
+    if (typeof imageData != "string" || !base64Pattern.test(imageData)) {
+      console.log("Invalid image data");
+      throw new Error("Invalid image data");
+    }
+
     let message;
     try {
       message = await this.client.messages.create({
