@@ -1,10 +1,10 @@
 import express from "express";
 import "dotenv/config";
-// import mongoose from "mongoose";
+import mongoose from "mongoose";
 import cors from "cors";
 import multer from "multer";
-// import AWS from "aws-sdk";
-// import Prompt from "./models/promptSchema.js";
+import AWS from "aws-sdk";
+import Prompt from "./models/promptSchema.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { AIService } from "./services/aiService.js";
@@ -32,13 +32,13 @@ app.get("/", (req, res) => {
 });
 
 // // Configure AWS SDK
-// AWS.config.update({
-//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//   region: REGION,
-// });
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: REGION,
+});
 
-// const s3 = new AWS.S3();
+const s3 = new AWS.S3();
 
 // Configure multer to use memory storage
 const storage = multer.memoryStorage();
@@ -51,10 +51,10 @@ const upload = multer({
 let fileBufferState = null; // Stores file buffer to memory for use by other routes
 let fileMimeTypeState = null; // Stores file type to memory for use by other routes
 
-// mongoose
-//   .connect(MONGO_URI)
-//   .then(() => console.log("Connected to DB"))
-//   .catch((error) => console.log(error));
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("Connected to DB"))
+  .catch((error) => console.log(error));
 
 app.post("/upload", upload.single("file"), async (req, res) => {
   const { file } = req; // Image file for S3 integration
@@ -69,28 +69,28 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   fileMimeTypeState = file.mimetype;
 
   //   // Upload the file to S3
-  //   const params = {
-  //     Bucket: S3_BUCKET,
-  //     Key: `${Date.now()}_${file.originalname}`, // Unique filename for each upload
-  //     Body: file.buffer,
-  //     ContentType: file.mimetype,
-  //   };
+  const params = {
+    Bucket: S3_BUCKET,
+    Key: `${Date.now()}_${file.originalname}`, // Unique filename for each upload
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  };
 
-  //   try {
-  //     const s3Response = await s3.upload(params).promise();
-  //     const prompt = new Prompt({ imgName: imageName });
-  //     await prompt.save();
+  try {
+    const s3Response = await s3.upload(params).promise();
+    const prompt = new Prompt({ imgName: imageName });
+    await prompt.save();
 
-  //     res
-  //       .status(200)
-  //       .json({ message: "Image uploaded", s3Url: s3Response.Location });
-  //   } catch (error) {
-  //     console.error("Error uploading to S3:", error);
-  //     res.status(500).json({ message: "Failed to upload image" });
-  //   }
+    res
+      .status(200)
+      .json({ message: "Image uploaded", s3Url: s3Response.Location });
+  } catch (error) {
+    console.error("Error uploading to S3:", error);
+    res.status(500).json({ message: "Failed to upload image" });
+  }
 });
 
-// Call API with file state in memory
+// Call Claude API with image file state and type in memory
 app.post("/generateLayoutCode", async (req, res) => {
   if (!fileBufferState) {
     console.log("No image file found in memory");
