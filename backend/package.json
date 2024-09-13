@@ -6,7 +6,8 @@
   "scripts": {
     "test": "test",
     "dev": "nodemon app.js",
-    "build:ui": "rm -rf dist && cd ../frontend/ && npm run build && cp -r dist ../backend"
+    "build:ui": "rm -rf dist && cd ../frontend/ && npm run build && cp -r dist ../backend && echo 'rebuilt UI in Linux'",
+    "windows:build:ui": "wsl rm -rf dist && cd ../frontend/ && npm run build && wsl cp -r dist ../backend && wsl echo 'rebuilt UI in Windows'"
   },
   "author": "",
   "license": "ISC",

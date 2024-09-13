@@ -1,6 +1,7 @@
 import Anthropic, { fileFromPath } from "@anthropic-ai/sdk";
 
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
+console.log("anthropic key", ANTHROPIC_KEY);
 
 const defaultPrompt = "Provide the CSS code for the image"; // Need a more robustly engineer prompt
 const allowedImageTypes =
@@ -22,14 +23,14 @@ class AIService {
     // Parameter validation
     if (
       typeof imageType != "string" ||
-      !allowedImageTypes.contains(imageType)
+      !allowedImageTypes.includes(imageType)
     ) {
       console.log("Invalid image type");
       throw new Error("Invalid image type.");
     }
 
     const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
-    if (typeof imageData != "string" || !base64pattern.test(imageData)) {
+    if (typeof imageData != "string" || !base64Pattern.test(imageData)) {
       console.log("Invalid image data");
       throw new Error("Invalid image data");
     }

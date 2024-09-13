@@ -2,14 +2,17 @@ import { useState } from "react";
 import ImageForm from "./components/ImageForm";
 import CodeSandbox from "./components/CodeSandbox";
 import useImageUploader from "./hooks/useImageUploader";
+// import useLayOutCodeGenerator from "./hooks/useLayoutCodeGenerator";
 import "./App.css";
-import { ImageService } from "./utils/imageUtils";
+import { ImageUtils } from "./utils/imageUtils";
 
-const imageService = new ImageService();
+const imageUtils = new ImageUtils();
+// const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const { handleSubmit, isImageUploading } = useImageUploader();
+  // const { handleGetCode, isLayoutCodeGenerating, layoutCode } = useLayoutCodeGenerator();
   const [getCodeIsVisibile, setGetCodeIsVisible] = useState(false);
   const [imageFormat, setImageFormat] = useState("");
   const [layoutResponse, setLayoutResponse] = useState("");
@@ -27,7 +30,7 @@ function App() {
     }
 
     try {
-      setImageFormat(imageService.validateImage(selectedImage));
+      setImageFormat(await imageUtils.validateImage(selectedImage));
     } catch (error) {
       console.log("Image validation error:", error.message);
       alert(error.message);
@@ -39,36 +42,52 @@ function App() {
     const formData = new FormData();
     formData.append("file", selectedImage);
 
-    try {
-      const response = await fetch(`http://localhost:3000/upload`, {
-        method: "POST",
-        body: formData,
-      });
+    setGetCodeIsVisible(true);
 
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Response from server: ", responseData);
-        setGetCodeIsVisible(true);
-        alert("Image uploaded successfully!");
-      } else {
-        alert("Image upload failed.");
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Error uploading image.");
-    }
+    //   try {
+    //     const response = await fetch(`http://localhost:3000/upload`, {
+    //       method: "POST",
+    //       body: formData,
+    //     });
+
+    //     if (response.ok) {
+    //       const responseData = await response.json();
+    //       console.log("Response from server: ", responseData);
+    //       setGetCodeIsVisible(true);
+    //       alert("Image uploaded successfully!");
+    //     } else {
+    //       alert("Image upload failed.");
+    //     }
+    //   } catch (error) {
+    //     console.error("Error uploading image:", error);
+    //     alert("Error uploading image.");
+    //   }
   };
 
+  // useing the LayoutCodeGenerate
+  // await handleGetCode();
+  // setLayoutResponse(layoutCode);
+
   const handleGetCode = async () => {
-    const processedImage = await imageService.preProcessImage(selectedImage);
+    // const processedImage = await imageService.preProcessImage(selectedImage);
+
     // Call the backend route to get code.
+    console.log("imageFormat:", imageFormat);
+    // var body = JSON.stringify({ imageFormat: imageFormat });
+    // console.log("jsonbody", body);
+    const imageFormData = new FormData();
+    // imageFormData.append("name", "imageFile");
+    imageFormData.append("file", selectedImage);
+    imageFormData.append("imageFormat", imageFormat);
+
+    // imageFormData.append("imageData", processedImage);
     try {
       const response = await fetch(`http://localhost:3000/generateLayoutCode`, {
         method: "POST",
-        body: {
-          format: imageFormat,
-          image: processedImage,
-        },
+        // headers: {
+        //   "content-type": "application/x-www-form-urlencoded",
+        // },
+        // body: imageFormData,
       });
 
       if (response.ok) {
@@ -79,10 +98,12 @@ function App() {
         setLayoutResponse(code);
         alert("Layout code successfully generated");
       } else {
+        const responseData = await response.json();
+        console.log("error response data", responseData);
         alert("Layout code failed to be generated.");
       }
     } catch (error) {
-      console.error("Error generating layout code:", error);
+      console.error("Error generating layout code:", error.message);
       alert("Error generating layout code.");
     }
   };

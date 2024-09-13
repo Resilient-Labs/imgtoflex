@@ -10,6 +10,6 @@ This application uses the Claude 3.5 Sonnet model to understand and analyze imag
 2. cd to /backend directory & run `npm install`
 3. run `npm run build:ui` (run when changes have been made to frontend)
 
-### Note: Windows machines will need to install Windows Subsystem for Linux (WSL) by running `wsl --install` in PowerShell or Windows Command and restart their machines in order to run Linux code.
+- Note: Windows machines will need to install Windows Subsystem for Linux (WSL) by running `wsl --install` in PowerShell or Windows Command and restart their machines in order to run Linux code.
 
 4. run `node app.js` or `npm run dev` for dev environment
