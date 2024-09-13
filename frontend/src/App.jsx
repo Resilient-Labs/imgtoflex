@@ -3,7 +3,7 @@ import ImageForm from "./components/ImageForm";
 import CodeSandbox from "./components/CodeSandbox";
 import useImageUploader from "./hooks/useImageUploader";
 import "./App.css";
-import { ImageService } from "./services/imageService";
+import { ImageService } from "./utils/imageUtils";
 
 const imageService = new ImageService();
 

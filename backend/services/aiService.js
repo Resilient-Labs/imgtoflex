@@ -3,8 +3,9 @@ import Anthropic, { fileFromPath } from "@anthropic-ai/sdk";
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
 
 const defaultPrompt = "Provide the CSS code for the image"; // Need a more robustly engineer prompt
-type allowedImageTypes = // Image type validation needed on front end - soft blocker
-  "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+const allowedImageTypes =
+  // Image type validation needed on front end - soft blocker
+  ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 class AIService {
   client = new Anthropic({
@@ -17,12 +18,22 @@ class AIService {
     return layoutCode;
   }
 
-  async #getLayout(
-    imageType: allowedImageTypes,
-    imageData: string, // there are some constraints here
-    prompt: string = defaultPrompt
-  ) {
-    console.log("imageType:", imageType);
+  async #getLayout(imageType, imageData, prompt = defaultPrompt) {
+    // Parameter validation
+    if (
+      typeof imageType != "string" ||
+      !allowedImageTypes.contains(imageType)
+    ) {
+      console.log("Invalid image type");
+      throw new Error("Invalid image type.");
+    }
+
+    const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
+    if (typeof imageData != "string" || !base64pattern.test(imageData)) {
+      console.log("Invalid image data");
+      throw new Error("Invalid image data");
+    }
+
     let message;
     try {
       message = await this.client.messages.create({
