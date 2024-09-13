@@ -33,8 +33,9 @@ const useLayOutCodeGenerator = () => {
         console.log("Response from server: ", responseData);
         const code = responseData["layoutCode"];
         console.log("layout code", code);
-        setLayoutCode(code);
-        alert("Layout code successfully generated");
+        await setLayoutCode(code);
+        console.log("layout code on backend,", layoutCode);
+        // alert("Layout code successfully generated");
       } else {
         const responseData = await response.json();
         console.log("error response data", responseData);
@@ -44,10 +45,11 @@ const useLayOutCodeGenerator = () => {
       console.error("Error generating layout code:", error.message);
       alert("Error generating layout code.");
     } finally {
-      setIsLayoutCodeGenerating(false);
+      console.log("right before set is layout code generating");
+      await setIsLayoutCodeGenerating(false);
     }
   };
-
+  console.log("right before return");
   return { handleGetCode, isLayoutCodeGenerating, layoutCode };
 };
 
