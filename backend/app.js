@@ -3,7 +3,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import cors from "cors";
 import multer from "multer";
-import AWS from "aws-sdk";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import Prompt from "./models/promptSchema.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -31,14 +31,15 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-// // Configure AWS SDK
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: REGION,
+// Configure AWS SDK
+const s3 = new S3Client({
+    region: REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
 });
 
-const s3 = new AWS.S3();
 
 // Configure multer to use memory storage
 const storage = multer.memoryStorage();
@@ -57,38 +58,43 @@ mongoose
   .catch((error) => console.log(error));
 
 app.post("/upload", upload.single("file"), async (req, res) => {
-  const { file } = req; // Image file for S3 integration
-  const { imageName, imageType, imageSize } = req.body; // Other data
+    const { file } = req; // Image file for S3 integration
+    const { imageName } = req.body; // Other data
 
-  if (!file) {
-    console.log("No file uploaded");
-    return res.status(400).json({ message: "No file uploaded." });
-  }
+    if (!file) {
+        console.log("No file uploaded");
+        return res.status(400).json({ message: "No file uploaded." });
+    }
 
-  fileBufferState = file.buffer;
-  fileMimeTypeState = file.mimetype;
+    fileBufferState = file.buffer;
+    fileMimeTypeState = file.mimetype;
 
-  //   // Upload the file to S3
-  const params = {
-    Bucket: S3_BUCKET,
-    Key: `${Date.now()}_${file.originalname}`, // Unique filename for each upload
-    Body: file.buffer,
-    ContentType: file.mimetype,
-  };
+    // Upload the file to S3
+    const params = {
+        Bucket: S3_BUCKET,
+        Key: `${Date.now()}_${file.originalname}`, // Unique filename for each upload
+        Body: file.buffer,
+        ContentType: file.mimetype,
+    };
 
-  try {
-    const s3Response = await s3.upload(params).promise();
-    const prompt = new Prompt({ imgName: imageName });
-    await prompt.save();
+    try {
+        // Use AWS SDK v3's PutObjectCommand and s3.send() for upload
+        const command = new PutObjectCommand(params);
+        const s3Response = await s3.send(command);
 
-    res
-      .status(200)
-      .json({ message: "Image uploaded", s3Url: s3Response.Location });
-  } catch (error) {
-    console.error("Error uploading to S3:", error);
-    res.status(500).json({ message: "Failed to upload image" });
-  }
+        const prompt = new Prompt({ imgName: imageName });
+        await prompt.save();
+
+        res.status(200).json({
+            message: "Image uploaded",
+            s3Url: `https://${S3_BUCKET}.s3.${REGION}.amazonaws.com/${params.Key}`,
+        });
+    } catch (error) {
+        console.error("Error uploading to S3:", error);
+        res.status(500).json({ message: "Failed to upload image" });
+    }
 });
+
 
 // Call Claude API with image file state and type in memory
 app.post("/generateLayoutCode", async (req, res) => {
