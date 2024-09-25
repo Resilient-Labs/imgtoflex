@@ -22,7 +22,7 @@ class ImageUtils {
       return allowedImageTypeByExtension[imageFileExtension[0]];
     } else {
       throw new Error(
-        "Image not allowed. Please upload image in format: .jpg, .jpeg, .png, .gif, .webp"
+        "Image not allowed -- Please upload image in format: .jpg, .jpeg, .png, .gif, .webp"
       );
     }
   }

@@ -1,7 +1,6 @@
 import Anthropic, { fileFromPath } from "@anthropic-ai/sdk";
 
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-console.log("anthropic key", ANTHROPIC_KEY);
 
 const defaultPrompt = "Provide the CSS code for the image"; // Need a more robustly engineer prompt
 const allowedImageTypes =
