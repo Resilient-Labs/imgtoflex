@@ -8,7 +8,7 @@
     "dev": "nodemon app.js",
     "build:ui": "rm -rf dist && cd ../frontend/ && npm run build && cp -r dist ../backend && echo 'rebuilt UI in Linux'",
     "wsl:build:ui": "wsl rm -rf dist && cd ../frontend/ && npm run build && wsl cp -r dist ../backend && wsl echo 'rebuilt UI in Windows'",
-    "windows:build:ui": "rmdir /S /Q dist && cd ../frontend/ && npm run build && xcopy /E /I /Y ../frontend/dist ../backend/dist && echo 'rebuilt UI in Windows'"
+    "windows:build:ui": "if exist dist (rmdir /S /Q dist) & cd ../frontend/ & npm run build & if not exist ../backend/dist (mkdir ../backend/dist) & xcopy /E /I /Y \"../frontend/dist\" \"../backend/dist\" & if %errorlevel%==0 (echo Copy successful) else (echo Copy failed)"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +20,7 @@
     "express": "^4.21.0",
     "mongoose": "^8.6.1",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "react-codemirror2": "^8.0.0"
   }
 }
